@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 
 const { User } = require('./models/User')
+const config = require('./config/key')
 
 const app = express()
 const port = 5000
@@ -17,7 +18,7 @@ app.use(bodyParser.json())
  * TODO 1. id, pw .env 도입해야할 필요 있음
  */
 mongoose
-    .connect('mongodb+srv://admin:1234@boilerplate-ho4sm.gcp.mongodb.net/<dbname>?retryWrites=true&w=majority', {
+    .connect(config.mongoURI, {
         useCreateIndex: true,
         useFindAndModify: false,
         useNewUrlParser: true,
