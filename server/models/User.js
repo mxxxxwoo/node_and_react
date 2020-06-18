@@ -1,5 +1,9 @@
 const mongoose = require('mongoose')
 
+/**
+ * * 고명우
+ * - userSchema 생성
+ */
 const userSchema = mongoose.Schema({
     name: {
         type: String,
@@ -31,6 +35,10 @@ const userSchema = mongoose.Schema({
     },
 })
 
+/**
+ * * 고명우
+ * - userSchema를 model로 감쌈
+ */
 const User = mongoose.model('User', userSchema)
 
 module.exports = { User }
