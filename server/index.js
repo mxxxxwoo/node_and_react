@@ -39,6 +39,7 @@ app.get('/', (req, res) => res.send('hello'))
  */
 app.post('/register', (req, res) => {
     const user = new User(req.body)
+    console.log(user)
     user.save((err, userInfo) => {
         if (err) return res.json({ success: false, err })
         return res.status(200).json({
