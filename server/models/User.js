@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
+const e = require('express')
 const saltRounds = 10
 
 /**
@@ -37,6 +38,13 @@ const userSchema = mongoose.Schema({
     },
 })
 
+userSchema.method.comparePassword = function (plainPassword, cb) {
+    bcrypt.compare(plainPassword, this.password, function (err, isMatch) {
+        if (err) return cb(err)
+        cb(null, isMatch)
+    })
+}
+
 /**
  * * 고명우
  * - 저장 전에 실행
@@ -54,6 +62,8 @@ userSchema.pre('save', function (next) {
                 next()
             })
         })
+    } else {
+        next()
     }
 })
 

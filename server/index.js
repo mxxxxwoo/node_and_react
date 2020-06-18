@@ -15,7 +15,6 @@ app.use(bodyParser.json())
  * * 고명우
  * - mongoose 연결
  * ! mongoose cluster에서 ip white list 설정해줘야함
- * TODO 1. id, pw .env 도입해야할 필요 있음
  */
 mongoose
     .connect(config.mongoURI, {
@@ -35,7 +34,7 @@ app.get('/', (req, res) => res.send('hello'))
 
 /**
  * * 고명우
- * - 회원가입 페이지
+ * - 회원가입 api
  */
 app.post('/register', (req, res) => {
     const user = new User(req.body)
@@ -46,6 +45,27 @@ app.post('/register', (req, res) => {
             success: true,
         })
     })
+})
+
+/**
+ * * 고명우
+ * - 로그인 api
+ */
+app.post('/login', (req, res) => {
+    // 요청 된 이메일 데이터베이스에서 찾기
+    User.findOne({ email: req.body.emai }, (err, user) => {
+        if (!user)
+            return res.json({
+                loginSucess: false,
+                message: '이메일이 틀렸습니다.',
+            })
+    })
+    // 요청 된 이메일이 데이터베이스에 있다면 비밀번호 검증
+    user.comparePassword(req.body.password, (err, isMatch) => {
+        if (!isMatch) return res.json({ loginSucess: false, message: '비밀번호가 틀렸습니다.' })
+        user.generateToken((err, user) => {})
+    })
+    // 비밀번호까지 확인된다면 토큰생성
 })
 
 /**
