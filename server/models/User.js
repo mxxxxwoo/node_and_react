@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const e = require('express')
+const jwt = require('jsonwebtoken')
 const saltRounds = 10
 
 /**
@@ -38,7 +39,7 @@ const userSchema = mongoose.Schema({
     },
 })
 
-userSchema.method.comparePassword = function (plainPassword, cb) {
+userSchema.methods.comparePassword = function (plainPassword, cb) {
     bcrypt.compare(plainPassword, this.password, function (err, isMatch) {
         if (err) return cb(err)
         cb(null, isMatch)
@@ -66,6 +67,26 @@ userSchema.pre('save', function (next) {
         next()
     }
 })
+
+/**
+ * * 고명우
+ * - token 생성
+ * @param {func} cb 함수호출시 작성한 콜백함수
+ */
+userSchema.methods.generateToken = function (cb) {
+    var user = this
+    // jsonwebtoken
+    jwt.sign(user._id.toHexString(), 'secritToken')
+
+    var token = user._id + 'secretToken'
+
+    user.token = token
+
+    user.save(function (err, user) {
+        if (err) return cb(err)
+        cb(null, user)
+    })
+}
 
 /**
  * * 고명우
