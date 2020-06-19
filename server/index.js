@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 
 const { User } = require('./models/User')
+const { auth } = require('./middleware/auth')
 const config = require('./config/key')
 
 const app = express()
@@ -37,7 +38,7 @@ app.get('/', (req, res) => res.send('hello'))
  * * 고명우
  * - 회원가입 api
  */
-app.post('/register', (req, res) => {
+app.post('/api/users/register', (req, res) => {
     const user = new User(req.body)
     console.log(user)
     user.save((err, userInfo) => {
@@ -52,7 +53,7 @@ app.post('/register', (req, res) => {
  * * 고명우
  * - 로그인 api
  */
-app.post('/login', (req, res) => {
+app.post('/api/users/login', (req, res) => {
     // 요청 된 이메일 데이터베이스에서 찾기
     User.findOne({ email: req.body.email }, (err, user) => {
         // 이메일 검증
@@ -76,6 +77,33 @@ app.post('/login', (req, res) => {
                 res.cookie('x_auth', user.token).status(200).json({ loginSucess: true, userId: user._id })
             })
         })
+    })
+})
+
+/**
+ * * 고명우
+ * - 유저 인증
+ */
+app.post('/api/users/auth', auth, (req, res) => {
+    // 미들웨어에서 인증절차를 거치고 성공했다면
+    res.status(200).json({
+        // role 0 -> 일반유저 role 0이 아니면 관리자
+        isAdmin: req.user.role === 0 ? false : true,
+        _id: req.user._id,
+        email: req.user.email,
+        image: req.user.image,
+        isAuth: true,
+        lastname: req.user.lastname,
+        name: req.user.name,
+        role: req.user.role,
+    })
+})
+
+app.get('/api/users/logout', auth, (req, res) => {
+    User.findOneAndUpdate({ _id: req.user._id }, { token: '' }, (err, user) => {
+        if (err) return res.json({ success: false, err })
+
+        return res.status(200).send({ success: true })
     })
 })
 

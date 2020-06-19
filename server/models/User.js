@@ -76,15 +76,31 @@ userSchema.pre('save', function (next) {
 userSchema.methods.generateToken = function (cb) {
     var user = this
     // jsonwebtoken
-    jwt.sign(user._id.toHexString(), 'secritToken')
-
-    var token = user._id + 'secretToken'
+    var token = jwt.sign(user._id.toHexString(), '1234')
 
     user.token = token
 
     user.save(function (err, user) {
         if (err) return cb(err)
         cb(null, user)
+    })
+}
+
+/**
+ * * 고명우
+ * - 유저가 갖고있는 토큰 검증
+ * @param {String} token - 유저가 갖고있던 토큰
+ * @param {func} cb  - 콜백 함수
+ */
+userSchema.statics.findByToken = function (token, cb) {
+    var user = this
+    // 토큰 복호화 및 검증
+    jwt.verify(token, 'secretToken', function (err, decoded) {
+        // console.log(err)
+        user.findOne({ _id: decoded, token: token }, (err, user) => {
+            if (err) return cb(err)
+            cb(null, user)
+        })
     })
 }
 
