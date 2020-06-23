@@ -107,6 +107,9 @@ app.get('/api/users/logout', auth, (req, res) => {
     })
 })
 
+app.get('/api/hello', (req, res) => {
+    res.send('안ㄴ여핫요')
+})
 /**
  * * 고명우
  * - 서버 실행
